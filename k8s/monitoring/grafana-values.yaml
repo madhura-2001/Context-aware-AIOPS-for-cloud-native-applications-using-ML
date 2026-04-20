@@ -1,0 +1,31 @@
+adminUser: admin
+adminPassword: aiops123
+
+persistence:
+  enabled: false
+
+resources:
+  requests:
+    memory: "128Mi"
+    cpu: "100m"
+  limits:
+    memory: "256Mi"
+    cpu: "300m"
+
+# Pre-configure data sources
+datasources:
+  datasources.yaml:
+    apiVersion: 1
+    datasources:
+      - name: Prometheus
+        type: prometheus
+        url: http://prometheus-server.aiops.svc.cluster.local
+        access: proxy
+        isDefault: true
+        editable: true
+
+      - name: Loki
+        type: loki
+        url: http://loki.aiops.svc.cluster.local:3100
+        access: proxy
+        editable: true

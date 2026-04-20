@@ -1,0 +1,57 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: llm-app
+  namespace: aiops
+  labels:
+    app: llm-app
+    component: ai-application
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: llm-app
+  template:
+    metadata:
+      labels:
+        app: llm-app
+        component: ai-application
+      annotations:
+        # Prometheus will discover and scrape this pod
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "5000"
+        prometheus.io/path: "/metrics"
+    spec:
+      containers:
+      - name: llm-app
+        image: aiops-llm-app:v1
+        imagePullPolicy: Never    # using local image
+        ports:
+        - containerPort: 5000
+          name: http
+        env:
+        - name: MOCK_MODE
+          value: "false"           # start with mock, change later
+        - name: GROQ_API_KEY
+          value: "your_api_key"               # add your key here when ready
+        - name: DEFAULT_MODEL
+          value: "llama-3.1-8b-instant"
+        resources:
+          requests:
+            memory: "128Mi"
+            cpu: "100m"
+          limits:
+            memory: "256Mi"
+            cpu: "500m"
+        readinessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 5
+          periodSeconds: 10
+        livenessProbe:
+          httpGet:
+            path: /health
+            port: 5000
+          initialDelaySeconds: 10
+          periodSeconds: 30

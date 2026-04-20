@@ -1,0 +1,21 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: llm-app-service
+  namespace: aiops
+  labels:
+    app: llm-app
+  annotations:
+    prometheus.io/scrape: "true"
+    prometheus.io/port: "5000"
+    prometheus.io/path: "/metrics"
+spec:
+  type: NodePort   # <-- added
+  selector:
+    app: llm-app
+  ports:
+  - name: http
+    port: 80
+    targetPort: 5000
+    nodePort: 30050   # <-- added (range: 30000–32767)
+    protocol: TCP

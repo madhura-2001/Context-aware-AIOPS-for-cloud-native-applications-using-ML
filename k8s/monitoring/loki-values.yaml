@@ -1,0 +1,58 @@
+loki:
+  auth_enabled: false
+
+  commonConfig:
+    replication_factor: 1
+
+  storage:
+    type: filesystem
+
+  schemaConfig:
+    configs:
+      - from: "2024-01-01"
+        store: tsdb
+        object_store: filesystem
+        schema: v13
+        index:
+          prefix: loki_index_
+          period: 24h
+
+  limits_config:
+    allow_structured_metadata: false
+
+singleBinary:
+  replicas: 1
+
+  persistence:
+    enabled: false        
+    
+  extraVolumes:
+    - name: loki-storage
+      emptyDir: {}
+
+  extraVolumeMounts:
+    - name: loki-storage
+      mountPath: /var/loki     # or 1Gi for local
+    
+
+  resources:
+    requests:
+      cpu: 100m
+      memory: 256Mi
+    limits:
+      cpu: 500m
+      memory: 512Mi
+
+# ✅ IMPORTANT FIX
+deploymentMode: SingleBinary
+
+# disable others
+backend:
+  replicas: 0
+read:
+  replicas: 0
+write:
+  replicas: 0
+
+gateway:
+  enabled: false
